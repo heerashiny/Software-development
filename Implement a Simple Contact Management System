@@ -1,0 +1,96 @@
+import csv
+import os
+
+FILENAME = "contacts.csv"
+
+def load_contacts():
+    contacts = []
+    if os.path.exists(FILENAME):
+        with open(FILENAME, newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                contacts.append(row)
+    return contacts
+
+def save_contacts(contacts):
+    with open(FILENAME, mode='w', newline='') as csvfile:
+        fieldnames = ['Name', 'Phone', 'Email']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for contact in contacts:
+            writer.writerow(contact)
+
+def add_contact():
+    name = input("Enter name: ")
+    phone = input("Enter phone number: ")
+    email = input("Enter email address: ")
+    contacts = load_contacts()
+    contacts.append({'Name': name, 'Phone': phone, 'Email': email})
+    save_contacts(contacts)
+    print("Contact added successfully.")
+
+def view_contacts():
+    contacts = load_contacts()
+    if not contacts:
+        print("No contacts found.")
+        return
+    print("\nContact List:")
+    for index, contact in enumerate(contacts, start=1):
+        print(f"{index}. {contact['Name']} - {contact['Phone']} - {contact['Email']}")
+
+def edit_contact():
+    contacts = load_contacts()
+    view_contacts()
+    try:
+        choice = int(input("Enter the number of the contact to edit: ")) - 1
+        if 0 <= choice < len(contacts):
+            contacts[choice]['Name'] = input("Enter new name: ")
+            contacts[choice]['Phone'] = input("Enter new phone number: ")
+            contacts[choice]['Email'] = input("Enter new email address: ")
+            save_contacts(contacts)
+            print("Contact updated successfully.")
+        else:
+            print("Invalid contact number.")
+    except ValueError:
+        print("Invalid input.")
+
+def delete_contact():
+    contacts = load_contacts()
+    view_contacts()
+    try:
+        choice = int(input("Enter the number of the contact to delete: ")) - 1
+        if 0 <= choice < len(contacts):
+            deleted = contacts.pop(choice)
+            save_contacts(contacts)
+            print(f"Deleted contact: {deleted['Name']}")
+        else:
+            print("Invalid contact number.")
+    except ValueError:
+        print("Invalid input.")
+
+def main():
+    while True:
+        print("\nContact Management System")
+        print("1. Add Contact")
+        print("2. View Contacts")
+        print("3. Edit Contact")
+        print("4. Delete Contact")
+        print("5. Exit")
+        choice = input("Choose an option: ")
+
+        if choice == '1':
+            add_contact()
+        elif choice == '2':
+            view_contacts()
+        elif choice == '3':
+            edit_contact()
+        elif choice == '4':
+            delete_contact()
+        elif choice == '5':
+            print("Exiting Contact Management System.")
+            break
+        else:
+            print("Invalid option. Please try again.")
+
+# Run the program
+main()
